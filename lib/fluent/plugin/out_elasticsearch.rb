@@ -34,6 +34,7 @@ module Fluent::Plugin
     config_param :scheme, :string, :default => 'http'
     config_param :hosts, :string, :default => nil
     config_param :target_index_key, :string, :default => nil
+    config_param :target_index_logstash_format, :bool, :default => false
     config_param :target_type_key, :string, :default => nil,
                  :deprecated => <<EOC
 Elasticsearch 7.x or above will ignore this config. Please use fixed type_name instead.
@@ -402,6 +403,9 @@ EOC
         target_index_parent, target_index_child_key = @target_index_key ? get_parent_of(record, @target_index_key) : nil
         if target_index_parent && target_index_parent[target_index_child_key]
           target_index = target_index_parent.delete(target_index_child_key)
+          if @target_index_logstash_format
+            target_index = "#{target_index}#{@logstash_prefix_separator}#{dt.strftime(@logstash_dateformat)}"
+          end
         elsif @logstash_format
           dt = dt.new_offset(0) if @utc_index
           target_index = "#{logstash_prefix}#{@logstash_prefix_separator}#{dt.strftime(@logstash_dateformat)}"
