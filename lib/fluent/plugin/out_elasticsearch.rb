@@ -35,6 +35,7 @@ module Fluent::Plugin
     config_param :hosts, :string, :default => nil
     config_param :target_index_key, :string, :default => nil
     config_param :target_index_logstash_format, :bool, :default => false
+    config_param :target_index_fallback, :bool, :default => true
     config_param :target_type_key, :string, :default => nil,
                  :deprecated => <<EOC
 Elasticsearch 7.x or above will ignore this config. Please use fixed type_name instead.
@@ -406,11 +407,15 @@ EOC
           if @target_index_logstash_format
             target_index = "#{target_index}#{@logstash_prefix_separator}#{dt.strftime(@logstash_dateformat)}"
           end
-        elsif @logstash_format
-          dt = dt.new_offset(0) if @utc_index
-          target_index = "#{logstash_prefix}#{@logstash_prefix_separator}#{dt.strftime(@logstash_dateformat)}"
+        elsif @target_index_fallback
+          elsif @logstash_format
+            dt = dt.new_offset(0) if @utc_index
+            target_index = "#{logstash_prefix}#{@logstash_prefix_separator}#{dt.strftime(@logstash_dateformat)}"
+          else
+            target_index = index_name
+          end
         else
-          target_index = index_name
+          next
         end
 
         # Change target_index to lower-case since Elasticsearch doesn't
