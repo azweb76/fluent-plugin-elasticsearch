@@ -408,7 +408,7 @@ EOC
             target_index = "#{target_index}#{@logstash_prefix_separator}#{dt.strftime(@logstash_dateformat)}"
           end
         elsif @target_index_fallback
-          elsif @logstash_format
+          if @logstash_format
             dt = dt.new_offset(0) if @utc_index
             target_index = "#{logstash_prefix}#{@logstash_prefix_separator}#{dt.strftime(@logstash_dateformat)}"
           else
