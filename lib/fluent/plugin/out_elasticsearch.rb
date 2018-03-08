@@ -407,6 +407,7 @@ EOC
           if @target_index_logstash_format
             target_index = "#{target_index}#{@logstash_prefix_separator}#{dt.strftime(@logstash_dateformat)}"
           end
+          log.debug "Pushing to elasticsearch target_index `target_index`."
         elsif @target_index_fallback
           if @logstash_format
             dt = dt.new_offset(0) if @utc_index
